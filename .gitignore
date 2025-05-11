@@ -1,3 +1,4 @@
 **/user-service/node_modules/
 **/user-service/.env
+**/video-service/.env
 /prompts.txt
