@@ -36,7 +36,7 @@ export const registerUser = async (
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS)
 
     const newUserResult = await pool.query(
-      "INSERT INTO users (firstname, lastname, email, password) VALUES ($1, $2, $3, $4) RETURNING id, firstname, lastname, email, created_at",
+      "INSERT INTO users (firstname, lastname, email, password) VALUES ($1, $2, $3, $4) RETURNING id, firstname, lastname, email, role, created_at",
       [firstname, lastname, email, hashedPassword]
     )
 
@@ -49,6 +49,7 @@ export const registerUser = async (
         firstname: newUser.firstname,
         lastname: newUser.lastname,
         email: newUser.email,
+        role: newUser.role,
         created_at: newUser.created_at,
       },
     })
@@ -97,6 +98,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       email: user.email,
       firstname: user.firstname,
       lastname: user.lastname,
+      role: user.role,
     }
 
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "1h" })
@@ -109,6 +111,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email,
+        role: user.role,
       },
     })
   } catch (error) {

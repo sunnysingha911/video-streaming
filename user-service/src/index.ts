@@ -4,6 +4,8 @@ import path from "path"
 import pool from "./config/database" // Import the pool
 import authRoutes from "./routes/authRoutes"
 import userRoutes from "./routes/userRoutes"
+import swaggerUi from "swagger-ui-express"
+import swaggerJsdoc from "swagger-jsdoc"
 
 dotenv.config()
 
@@ -21,6 +23,44 @@ app.set("view engine", "pug")
 // Routes
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
+
+// Swagger JSDoc options
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "User Service API",
+      version: "1.0.0",
+      description: "API documentation for the User Service",
+    },
+    servers: [
+      {
+        url: `http://localhost:${process.env.PORT || 3000}/api`,
+        description: "Development server",
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+  // Paths to files containing OpenAPI definitions
+  apis: ["./src/routes/*.ts", "./src/models/*.ts"],
+}
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions)
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 // Test DB connection
 app.get("/test-db", async (req: Request, res: Response) => {

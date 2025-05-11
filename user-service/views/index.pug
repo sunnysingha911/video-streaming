@@ -14,6 +14,9 @@ html
       li POST /api/auth/register - Register a new user
       li POST /api/auth/login - Login a user
       li GET /api/users/me - Get current user information (requires token)
+      li GET /api/users/:id - Get user by ID (Admin/Superadmin - requires token)
+      li PUT /api/users/:id - Update user by ID (Admin/Superadmin - requires token)
+      li DELETE /api/users/:id - Delete user by ID (Admin/Superadmin - requires token)
 
     p To test the database connection, visit 
       a(href="/test-db") /test-db 

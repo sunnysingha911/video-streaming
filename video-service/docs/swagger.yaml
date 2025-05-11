@@ -1,0 +1,314 @@
+basePath: /
+definitions:
+  models.Video:
+    properties:
+      categories:
+        items:
+          type: string
+        type: array
+      description:
+        type: string
+      duration:
+        description: Duration in seconds
+        type: number
+      id:
+        type: string
+      manifest_url:
+        description: URL for the HLS/DASH manifest
+        type: string
+      preview_url:
+        type: string
+      s3_key:
+        description: Key for the original video in S3
+        type: string
+      status:
+        description: e.g., "uploading", "processing", "ready", "error"
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      thumbnail_url:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      uploaded_at:
+        type: string
+      uploader_id:
+        description: ID of the admin who uploaded
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample video streaming service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Video Service API
+  version: "1.0"
+paths:
+  /admin/videos:
+    get:
+      description: Retrieves a paginated list of all videos. Admin access.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Video'
+            type: array
+        "500":
+          description: Error fetching videos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all videos (admin)
+      tags:
+      - videos
+    post:
+      consumes:
+      - application/json
+      description: Creates a new video metadata record in the database. Actual video
+        file upload is a separate step.
+      parameters:
+      - description: Video metadata
+        in: body
+        name: video
+        required: true
+        schema:
+          $ref: '#/definitions/models.Video'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error creating video
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new video record
+      tags:
+      - videos
+  /admin/videos/{id}:
+    delete:
+      description: Deletes a video and its associated metadata. Admin access.
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid video ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Video not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error deleting video
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a video by ID
+      tags:
+      - videos
+    get:
+      description: Retrieves video metadata for a given video ID. Admin access.
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Invalid video ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Video not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error fetching video
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a single video by ID
+      tags:
+      - videos
+    put:
+      consumes:
+      - application/json
+      description: Updates the metadata of an existing video. Admin access.
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Video metadata to update
+        in: body
+        name: video
+        required: true
+        schema:
+          $ref: '#/definitions/models.Video'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Invalid request payload or video ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Video not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error updating video
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing video
+      tags:
+      - videos
+  /videos:
+    get:
+      description: Retrieves a paginated list of videos with status "ready".
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Video'
+            type: array
+        "500":
+          description: Error fetching videos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List available videos for users
+      tags:
+      - videos
+  /videos/{id}:
+    get:
+      description: Retrieves video metadata for a given video ID. Only returns videos
+        with status "ready".
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Invalid video ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Video not found or not ready
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error fetching video
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a single video by ID for users
+      tags:
+      - videos
+schemes:
+- http
+swagger: "2.0"
