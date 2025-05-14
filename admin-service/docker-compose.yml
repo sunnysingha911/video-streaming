@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  admin-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - db
+    environment:
+      - DB_SOURCE=postgresql://admin:password@db:5432/admindb?sslmode=disable # Placeholder, will be used later
+      - GIN_MODE=debug # or release for production
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=admindb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
